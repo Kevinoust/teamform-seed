@@ -89,29 +89,32 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 		//load team forming detail in teacher panel
 		$scope.loadTeamFormingDetail=function()
 		{
-			$scope.loadStudentList($scope.ckey);
+			$scope.loadStudentListForInvite($scope.ckey);
 			
 			firebase.database().ref("courses/"+$scope.ckey).once('value', function(data) {
 				var tmp=[];
 				var courseData=data.val();
 				
 				var teamList = courseData.team;
-				
-				for(var i=0;i<teamList.length;i++)
+				if(typeof(teamList)!="undefined")
 				{
-					firebase.database().ref("Team/"+teamList[i]).once('value', function(data) {
-						var teamData=data.val();
-						var tempTeam=[];
-						tempTeam.name=teamData.name;
-						tempTeam.key=teamList[i];
-						tempTeam.member=teamData.member;
-						$scope.existedTeam.push(tempTeam);
-						
-					})
+					for(var i=0;i<teamList.length;i++)
+					{
+						firebase.database().ref("Team/"+teamList[i]).once('value', function(data) {
+							var teamData=data.val();
+							var tempTeam=[];
+							tempTeam.name=teamData.name;
+							tempTeam.key=teamList[i];
+							tempTeam.member=teamData.member;
+							$scope.existedTeam.push(tempTeam);
+							
+						})
+					}
 				}
-				console.log($scope.existedTeam);
+
+				//console.log($scope.existedTeam);
 			});	
-			
+			$.fancybox.open("#teamFormingDetail");
 			
 		}
 		
@@ -606,6 +609,7 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 			}
 		}
 
+
 		$scope.updateUserList=function(newTeamData)
 		{
 			var tmpMember=[];
@@ -647,7 +651,13 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 		{
 			userAccount.orderByChild("email").equalTo(email).on("child_added", function(data)
 			{
-				array.push({"key":data.getKey(),"data":data.val()});
+				var tmp=data.val();
+				if(typeof(tmp.icon)=="undefined")
+				{
+					tmp.icon="image/usericon.png";
+				}
+
+				array.push({"key":data.getKey(),"data":tmp});
 			});
 				
 		}
@@ -663,6 +673,23 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 				}
 				$scope.studentList=tmp;		
 			});	
+		}
+		
+		
+		$scope.userObjectArrayPush=function(email,array)
+		{
+			userAccount.orderByChild("email").equalTo(email).on("child_added", function(data)
+			{
+					var tmp=data.val();
+					
+					if(typeof(tmp.icon)=="undefined")
+					{
+						tmp.icon="image/usericon.png";
+					}
+					
+					array.push({"key":data.getKey(),"data":tmp});
+			});
+				
 		}
 		
 		$scope.loadInviteList=function(teamData)
@@ -764,10 +791,80 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 			}
 		
 		}
+		
+		
+		
+		$scope.userObjectArrayPushForInvite=function(email,array)
+		{
+			var courseData=[];
+			firebase.database().ref("courses/"+$scope.ckey).once('value', function(data) {
+				courseData=data.val();
+				
+			});	
+			
+			userAccount.orderByChild("email").equalTo(email).on("child_added", function(data)
+			{
+				if(typeof(data.val().team)!="undefined")
+				{	
+					//change object to array
+					var teamArrayOfStudent = $.map(data.val().team, function(value, index) {
+						return [value];
+					});	
+					
+					for(var i=0;i<courseData.team.length;i++)
+					{
+						for(var j=0;j<teamArrayOfStudent.length;j++)
+						{
+							//console.log(courseData.team[i]);
+							//console.log(teamArrayOfStudent[j]);
+							//console.log(courseData.team[i]==teamArrayOfStudent[j]);
+							if(courseData.team[i]==teamArrayOfStudent[j])
+							{
+								return false;
+							}
+						}
+					}
+					
+					var tmp=data.val();
+					if(typeof(tmp.icon)=="undefined")
+					{
+						tmp.icon="image/usericon.png";
+					}
+
+					array.push({"key":data.getKey(),"data":tmp});
+				}
+				else
+				{
+					var tmp=data.val();
+					if(typeof(tmp.icon)=="undefined")
+					{
+						tmp.icon="image/usericon.png";
+					}
+
+					array.push({"key":data.getKey(),"data":tmp});
+				}
+			
+			});
+				
+		}
+		
+		$scope.loadStudentListForInvite=function(key)
+		{
+			firebase.database().ref("courses/"+key).once('value', function(data) {
+				var tmp=[];
+				var courseData=data.val();
+				for(i=0;i<courseData.student.length;i++)
+				{
+					$scope.userObjectArrayPushForInvite(courseData.student[i],tmp);
+				}
+				$scope.studentList=tmp;		
+			});	
+		}
+		
 
 		$scope.inviteForm=function()
 		{
-			$scope.loadStudentList($scope.ckey);
+			$scope.loadStudentListForInvite($scope.ckey);
 			
 			
 			if($scope.tTag.length>0 && $scope.studentList.length>0)
@@ -824,6 +921,10 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 					{
 						$scope.currCourse=data.val();
 						$scope.currCourse.key=data.getKey();
+						if(typeof($scope.currCourse.isFormed)=="undefined")
+						{
+							$scope.currCourse.isFormed=false;
+						}
 						$scope.courseInfo.image=$scope.currCourse.image;
 						$scope.roleAccessCheck();						
 					}
@@ -997,7 +1098,15 @@ app.controller("teamPanelCtrl", function($scope,$rootScope,user,$firebaseArray,$
 					{
 						$scope.courseInfo.team=data.val().team;
 					}
-					
+					if(typeof(data.val().student)!="undefined")
+					{
+						$scope.courseInfo.student=data.val().student;
+					}
+					if(typeof(data.val().isForemed)!="undefined")
+					{
+						$scope.courseInfo.isForemed=data.val().isForemed;
+					}
+					console.log("$scope.courseInfo",$scope.courseInfo);
 					firebase.database().ref("courses/"+$scope.ckey).set($scope.courseInfo).then(function(){
 						
 						$window.location.href="index.html";		

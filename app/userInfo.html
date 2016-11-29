@@ -54,10 +54,11 @@
 	<script src="js/userInfo.js"></script>
 	
 	
-	
 	<!-- Customized CSS shared by pages -->
 	<link href="css/theme.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="css/dash.css">
+		<link href="css/theme.css" rel="stylesheet" type="text/css">
+	<link href="css/teamPanel.css" rel="stylesheet" type="text/css">
 <body>
 <div ng-controller="dashBoardCtrl">
 
@@ -70,17 +71,52 @@
 		</div>
         <!-- Page Content -->
 		<div class="row content">
-		<div class="heading"><h1>Team Searching Panel</h1></div>
+		<div class="heading"><h1>About Me</h1></div>
+        <div  ng-controller="userInfoCtrl">
+            <div style="padding:0 20px;">
+                <div style="font-size:30px;font-weight:300;padding-bottom:10px;">{{userData.userName}}</div>
+                <div style="width:150px;height:150px; background-image: url('{{userData.image}}');  background-repeat: no-repeat;background-position: center;border-radius:10px;"></div>
+                </br></br>
+				 <div class="section" style="margin-left:0">Basic Information</div>
+				<tr><td><label style="font-weight:inherit">Added Tags</label></td>
+				   :</td>
+				<td>
+					<div id="addedTags" ng-repeat="q in userData.tags">
+						<ul>
+							<li class="tag"><i class="fa fa-tag" aria-hidden="true"></i> {{q}}
+							</li>
+						</ul>
+					</div>
+				</td></tr>
+				<br><br>
+				<tr><td><label style="font-weight:inherit">Courses</label></td>
+				   :</td>
+				<td>
+					<div id="addedTags" ng-repeat="q in userData.courseName">
+						<ul>
+							<li class="tag"><i class="fa fa-book" aria-hidden="true"></i> {{q}}
+							</li>
+						</ul>
+					</div>
+				</td></tr>
+				
+                <div class="section" style="margin-left:0">Contact Information</div>
+            <style>tr>td{line-height: 2em}tr>td:nth-child(1){padding-right: 5px;}tr>td:nth-child(2){padding-right: 15px;}</style>
+                <table style="" ng-repeat="q in userData.contact">
+                        <tr ><td>{{q.key}}</td><td>:</td><td>{{q.data}}</td></tr>
 
+
+                </table>
+                </br></br>
+                <!--<div class="section" style="margin-left:0">Description</div>
+                <p>{{userData.description}}</p>-->
+	
+            </div>
+		</div>
 		
        </div>
         <!-- /#page-content-wrapper -->
-		<div  ng-controller="userInfoCtrl">
-	{{userData}}
 
-		
-		
-		</div>
     </div>
     
 	<!-- /#wrapper -->

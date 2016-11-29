@@ -1,10 +1,10 @@
 .profile{
     border: 10px solid transparent;
     padding: 15px;
-    -webkit-border-image: url(../image/border.png) 30 stretch; /* Safari 3.1-5 */
-    -o-border-image: url(../image/border.png) 30 stretch; /* Opera 11-12.1 */
+    /*-webkit-border-image: url(../image/border.png) 30 stretch;
+    -o-border-image: url(../image/border.png) 30 stretch;
     border-image: url(../image/border.png) 30 stretch;
-  
+    background-color: rgba(255, 255, 255, 0.4);*/
 }
 
 p{
@@ -22,15 +22,6 @@ label{
     padding-bottom: 10px;
 }
 
-input[type="text"], input[type="password"]{
-    border-radius: 6px;
-    padding-left: 5px;
-    padding-right: 15px;
-    height: 30px;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
 #addedTags{
     display:inline-flex;
     word-wrap: break-word;
@@ -43,24 +34,7 @@ input[type="text"], input[type="password"]{
     display:inline;
     word-break: break-all;
 }
-.heading h1{
-    font-size: 1.8em;
-    line-height: 1.5;
-    font-weight: 200;
-    padding: 5px;
-    padding-left: 20px;
-    width: 100%;
-    margin-top: -30px;
-    border-bottom: solid 1px #C7CDD1;
-    margin-bottom: 20px;
-}
 
 .myProfile{
     padding-left: 50px;
-}
-
-.section{
-    border-bottom: 1px dotted grey;
-    margin-bottom: 10px;
-    font-size: 1.5em;
 }
